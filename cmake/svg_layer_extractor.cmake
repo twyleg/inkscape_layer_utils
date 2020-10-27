@@ -19,11 +19,11 @@ function(EXTRACT_SVG_LAYERS)
 		add_custom_target(
 			${input_filename}
 			ALL 
-			${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			python ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
 		)
 
 		execute_process(
-			COMMAND ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			COMMAND python ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
 		)
 	endforeach()
 
