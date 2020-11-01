@@ -1,6 +1,12 @@
 set(script ${CMAKE_CURRENT_LIST_DIR}/../app/extract_svg_layers.py)
 
-function(EXTRACT_SVG_LAYERS)
+function(extract_svg_layers)
+
+	find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+	if (NOT DEFINED Python3_FOUND)
+		message(FATAL_ERROR "Python3 not found. Please check your installation and PATH variable.")
+	endif()
 	
 	set(oneValueArgs OUTPUT_DIR)
 	set(multiValueArgs INPUT_FILES)
@@ -19,11 +25,11 @@ function(EXTRACT_SVG_LAYERS)
 		add_custom_target(
 			${input_filename}
 			ALL 
-			python ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
 		)
 
 		execute_process(
-			COMMAND python ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			COMMAND ${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
 		)
 	endforeach()
 
