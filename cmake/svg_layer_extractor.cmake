@@ -8,11 +8,12 @@ function(extract_svg_layers)
 		message(FATAL_ERROR "Python3 not found. Please check your installation and PATH variable.")
 	endif()
 	
-	set(oneValueArgs OUTPUT_DIR)
+	set(oneValueArgs OUTPUT_DIR QRC_FILENAME)
 	set(multiValueArgs INPUT_FILES)
 	cmake_parse_arguments(EXTRACT_SVG_LAYERS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
 	set(output_dir ${EXTRACT_SVG_LAYERS_OUTPUT_DIR})
+	set(qrc_filename ${EXTRACT_SVG_LAYERS_QRC_FILENAME})
 	file(MAKE_DIRECTORY ${output_dir})
 
 	foreach(input_file IN LISTS EXTRACT_SVG_LAYERS_INPUT_FILES)
@@ -25,11 +26,11 @@ function(extract_svg_layers)
 		add_custom_target(
 			${input_filename}
 			ALL 
-			${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc ${qrc_filename}
 		)
 
 		execute_process(
-			COMMAND ${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc svg_multilayer_extracted.qrc
+			COMMAND ${Python3_EXECUTABLE} ${script} -o ${output_dir} ${input_file} --qrc ${qrc_filename}
 		)
 	endforeach()
 
