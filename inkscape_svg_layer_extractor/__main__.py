@@ -1,0 +1,3 @@
+from inkscape_svg_layer_extractor.inkscape_svg_layer_extractor import main
+
+main()

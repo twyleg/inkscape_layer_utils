@@ -171,16 +171,18 @@ def extract_svg_image(input_file_filepath, output_directory):
 
     extract_layers(output_directory, input_file_filename_without_extension, layer_paths_list, input_image_tree)
 
-
-if __name__ == "__main__":
+def main():
+    global verbose
+    global force
+    global qrc_path
 
     if verbose:
         print('SVG Extractor - Started!')
         print('')
 
-    #
-    # Register namespace for inkscape
-    #
+        #
+        # Register namespace for inkscape
+        #
     ET.register_namespace("", "http://www.w3.org/2000/svg")
     ET.register_namespace("dc", "http://purl.org/dc/elements/1.1/")
     ET.register_namespace("cc", "http://creativecommons.org/ns#")
@@ -257,3 +259,5 @@ if __name__ == "__main__":
     if qrc_path is not None:
         write_qrc_file(svg_output_directory, qrc_path)
 
+if __name__ == "__main__":
+    main()

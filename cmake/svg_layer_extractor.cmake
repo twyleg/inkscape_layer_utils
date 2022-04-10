@@ -1,6 +1,6 @@
-set(script ${CMAKE_CURRENT_LIST_DIR}/../app/extract_svg_layers.py)
+set(script ${CMAKE_CURRENT_LIST_DIR}/../inkscape_svg_layer_extractor/inkscape_svg_layer_extractor.py)
 
-function(extract_svg_layers)
+function(extract_inkscape_svg_layers)
 
 	find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
