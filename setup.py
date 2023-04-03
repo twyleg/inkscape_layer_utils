@@ -2,7 +2,7 @@ import os
 from setuptools import find_packages, setup
 
 
-NAME = 'inkscape_svg_layer_extractor'
+NAME = 'inkscape_layer_utils'
 VERSION = '0.0.2'
 
 def read(fname):
