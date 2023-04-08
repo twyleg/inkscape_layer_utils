@@ -12,22 +12,22 @@ class Object:
     def __init__(self, object_element: Element) -> None:
         self.object_element = object_element
         self.tag = object_element.tag
-        self.id = object_element.attrib['id']
+        self.id = object_element.attrib["id"]
 
     def __str__(self) -> str:
-        return f'Object: tag={self.tag}, id={self.id}'
+        return f"Object: tag={self.tag}, id={self.id}"
 
     def set_fill_color(self, color: str) -> None:
-        style = self.object_element.attrib['style']
-        style_dict = OrderedDict(item.split(':') for item in style.split(';'))
-        style_dict['fill'] = color
-        self.object_element.attrib['style'] = ';'.join([f'{key}:{value}' for key, value in style_dict.items()])
+        style = self.object_element.attrib["style"]
+        style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+        style_dict["fill"] = color
+        self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
 
 class Group:
     def __init__(self, group_element: Element):
         self.group_element: Element = group_element
-        self.id = group_element.attrib['id']
+        self.id = group_element.attrib["id"]
         self.objects: OrderedDict[str, Object] = self.__parse_objects()
         self.groups: OrderedDict[str, Group] = self.__parse_groups()
 
@@ -35,18 +35,18 @@ class Group:
         object_dict: OrderedDict[str, Object] = OrderedDict()
 
         for element in self.group_element:
-            if not element.tag == '{http://www.w3.org/2000/svg}g':
+            if not element.tag == "{http://www.w3.org/2000/svg}g":
                 object = Object(element)
                 object_dict[object.id] = object
 
         return object_dict
 
-    def __parse_groups(self) -> OrderedDict[str, 'Group']:
-        group_dict: OrderedDict[str, 'Group'] = OrderedDict()
+    def __parse_groups(self) -> OrderedDict[str, "Group"]:
+        group_dict: OrderedDict[str, "Group"] = OrderedDict()
 
-        for group_element in self.group_element.findall('{http://www.w3.org/2000/svg}g'):
-            groupmode = group_element.get('{http://www.inkscape.org/namespaces/inkscape}groupmode')
-            if not groupmode or groupmode != 'layer':
+        for group_element in self.group_element.findall("{http://www.w3.org/2000/svg}g"):
+            groupmode = group_element.get("{http://www.inkscape.org/namespaces/inkscape}groupmode")
+            if not groupmode or groupmode != "layer":
                 group = Group(group_element)
                 group_dict[group.id] = group
 
@@ -62,28 +62,30 @@ class Layer(Group):
         super().__init__(layer_element)
         self.layer_element: Element = layer_element
         if parent_layer_path:
-            self.layer_name = layer_element.attrib['{http://www.inkscape.org/namespaces/inkscape}label']
-            self.layer_path = f'/{self.layer_name}' if parent_layer_path == '/' else '/'.join([parent_layer_path, self.layer_name])
+            self.layer_name = layer_element.attrib["{http://www.inkscape.org/namespaces/inkscape}label"]
+            self.layer_path = (
+                f"/{self.layer_name}" if parent_layer_path == "/" else "/".join([parent_layer_path, self.layer_name])
+            )
         else:
-            self.layer_name = '/'
-            self.layer_path = '/'
+            self.layer_name = "/"
+            self.layer_path = "/"
         self.layers: OrderedDict[str, Layer] = self.__parse_layers()
 
     def __str__(self):
-        return f'Layer: name={self.layer_name}'
+        return f"Layer: name={self.layer_name}"
 
-    def __parse_layers(self) -> OrderedDict[str, 'Layer']:
+    def __parse_layers(self) -> OrderedDict[str, "Layer"]:
         layer_dict: OrderedDict[str, Layer] = OrderedDict()
 
-        for group_element in self.layer_element.findall('{http://www.w3.org/2000/svg}g'):
-            groupmode = group_element.get('{http://www.inkscape.org/namespaces/inkscape}groupmode')
-            if groupmode and groupmode == 'layer':
+        for group_element in self.layer_element.findall("{http://www.w3.org/2000/svg}g"):
+            groupmode = group_element.get("{http://www.inkscape.org/namespaces/inkscape}groupmode")
+            if groupmode and groupmode == "layer":
                 layer = Layer(group_element, self.layer_path)
                 layer_dict[layer.layer_name] = layer
 
         return layer_dict
 
-    def find_first_layer_by_name(self, layer_name: str) -> Optional['Layer']:
+    def find_first_layer_by_name(self, layer_name: str) -> Optional["Layer"]:
         expected_layer = self.layers.get(layer_name)
 
         if expected_layer is not None:
@@ -96,10 +98,10 @@ class Layer(Group):
         return None
 
     def get_layer_by_path(self, path: str):
-        if path == '/':
+        if path == "/":
             return self
         else:
-            layer_names = path[1:].split('/')
+            layer_names = path[1:].split("/")
             current_layer = self
             for layer_name in layer_names:
                 current_layer = current_layer.layers[layer_name]
@@ -127,7 +129,7 @@ class Layer(Group):
         self.groups.clear()
 
     def remove_layers_if_path_not_matching(self, paths: List[str]) -> None:
-        layers_to_remove: List['Layer'] = []
+        layers_to_remove: List["Layer"] = []
         for layer in self.layers.values():
             remove_layer = True
             for path in paths:
@@ -144,23 +146,22 @@ class Layer(Group):
             self.layer_element.remove(layer_to_remove.layer_element)
             del self.layers[layer_to_remove.layer_name]
 
-        if self.layer_path != '/' and self.layer_path not in paths:
+        if self.layer_path != "/" and self.layer_path not in paths:
             self.remove_all_objects_and_groups()
 
 
 class Image(Layer):
-
     def __init__(self, element_tree: ElementTree) -> None:
         super().__init__(element_tree.getroot(), None)
         self.element_tree: ElementTree = element_tree
 
-    def extract_layer(self, path: str, preserve_layer_paths=True) -> 'Image':
-        if path == '/':
+    def extract_layer(self, path: str, preserve_layer_paths=True) -> "Image":
+        if path == "/":
             return copy.deepcopy(self)
         else:
             return self.extract_layers([path], preserve_layer_paths)
 
-    def extract_layers(self, paths: List[str], preserve_layer_paths=True) -> 'Image':
+    def extract_layers(self, paths: List[str], preserve_layer_paths=True) -> "Image":
         new_image = copy.deepcopy(self)
 
         if preserve_layer_paths:
@@ -177,15 +178,15 @@ class Image(Layer):
                 new_image.layer_element.append(layer_to_extract.layer_element)
         return new_image
 
-    def extract_all_layers(self) -> dict[str, 'Image']:
+    def extract_all_layers(self) -> dict[str, "Image"]:
         layer_path_list = self.get_all_layer_paths()
         return dict((layer_path, self.extract_layer(layer_path)) for layer_path in layer_path_list)
 
     def extract_all_layers_to_file(self, output_dir: PathLike, base_name: str) -> None:
         extracted_images = self.extract_all_layers()
         for layer_path, extracted_image in extracted_images.items():
-            if layer_path == '/':
-                extracted_image.save(Path(output_dir) / f'{base_name}.svg')
+            if layer_path == "/":
+                extracted_image.save(Path(output_dir) / f"{base_name}.svg")
             else:
                 extracted_image.save(Path(output_dir) / f'{base_name}{layer_path.replace("/", "_")}.svg')
 

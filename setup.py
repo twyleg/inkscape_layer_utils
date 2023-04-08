@@ -9,7 +9,7 @@ def read(fname):
 
 
 setup(
-    name='inkscape_layer_utils',
+    name="inkscape_layer_utils",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     author="Torsten Wylegala",
@@ -19,11 +19,11 @@ setup(
     keywords="inkscape svg layer utilities",
     url="https://github.com/twyleg",
     packages=find_packages(),
-    long_description=read('README.rst'),
+    long_description=read("README.rst"),
     install_requires=[],
     entry_points={
-        'console_scripts': [
-            'inkscape_layer_utils = inkscape_layer_utils.main:main',
+        "console_scripts": [
+            "inkscape_layer_utils = inkscape_layer_utils.main:main",
         ]
-    }
+    },
 )
