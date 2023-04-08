@@ -1,0 +1,7 @@
+include README.rst
+include LICENSE
+include requirements.txt
+graft inkscape_layer_utils
+recursive-exclude * *.py[co]
+include versioneer.py
+include inkscape_layer_utils/_version.py

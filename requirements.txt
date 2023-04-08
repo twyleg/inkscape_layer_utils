@@ -2,4 +2,6 @@ setuptools
 wheel
 twine
 mypy
+black
 tox
+versioneer

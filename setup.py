@@ -1,12 +1,7 @@
 # Copyright (C) 2023 twyleg
 import os
+import versioneer
 from setuptools import find_packages, setup
-
-from inkscape_layer_utils._version import __version__
-
-
-NAME = 'inkscape_layer_utils'
-VERSION = __version__
 
 
 def read(fname):
@@ -14,8 +9,9 @@ def read(fname):
 
 
 setup(
-    name=NAME,
-    version=VERSION,
+    name='inkscape_layer_utils',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     author="Torsten Wylegala",
     author_email="mail@twyleg.de",
     description=("Simple library to extract and manipulate layers from inscape SVGs"),
@@ -23,9 +19,8 @@ setup(
     keywords="inkscape svg layer utilities",
     url="https://github.com/twyleg",
     packages=find_packages(),
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     install_requires=[],
-    cmdclass={},
     entry_points={
         'console_scripts': [
             'inkscape_layer_utils = inkscape_layer_utils.main:main',
