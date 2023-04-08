@@ -8,16 +8,15 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import List
 
+from inkscape_layer_utils._version import __version__
 from inkscape_layer_utils.image import Image
-
-VERSION = '0.0.1'
 
 
 def extract_layers() -> None:
     parser = argparse.ArgumentParser(prog='inkscape_layer_utils extract_layers')
     parser.add_argument('svg_files', metavar='svg_files', type=str, nargs='+',
                         help='SVG image file(s) to extract the layers from.')
-    parser.add_argument('-v', '--version', help='show version and exit', action='version', version=VERSION)
+    parser.add_argument('-v', '--version', help='show version and exit', action='version', version=__version__)
     parser.add_argument('-o', '--output', dest='output', default=os.path.join(os.getcwd(), 'output'),
                         help='Output directory for extracted layers. Default="./"')
 
