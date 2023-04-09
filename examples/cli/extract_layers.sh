@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-export PYTHONPATH=../../
+python -m venv venv
+source venv/bin/activate
+pip install inkscape_layer_utils
 
-python ../../inkscape_layer_utils/main.py extract_layers -o output/ ../../resources/test_images/*
+inkscape_layer_utils extract_layers -o output/ ../../resources/test_images/*

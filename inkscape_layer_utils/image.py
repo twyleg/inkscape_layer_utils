@@ -1,6 +1,7 @@
 # Copyright (C) 2023 twyleg
 import copy
 import os
+import xml.etree.ElementTree as ET
 from os import PathLike
 from collections import OrderedDict
 from pathlib import Path
@@ -149,8 +150,23 @@ class Layer(Group):
         if self.layer_path != "/" and self.layer_path not in paths:
             self.remove_all_objects_and_groups()
 
+    def fill_all_objects(self, color: str, recursive=False) -> None:
+        super().fill_all_objects(color)
+
+        if recursive:
+            for layer in self.layers.values():
+                layer.fill_all_objects(color, recursive=recursive)
+
 
 class Image(Layer):
+    @classmethod
+    def load_from_file(cls, file_path: PathLike) -> "Image":
+        return Image(ET.parse(file_path))
+
+    @classmethod
+    def load_from_string(cls, image_as_string: str) -> "Image":
+        return Image(ElementTree(ET.fromstring(image_as_string)))
+
     def __init__(self, element_tree: ElementTree) -> None:
         super().__init__(element_tree.getroot(), None)
         self.element_tree: ElementTree = element_tree
