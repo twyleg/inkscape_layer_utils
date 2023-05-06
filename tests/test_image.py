@@ -6,7 +6,8 @@ import xml.etree.ElementTree as ET
 
 from os import PathLike
 from pathlib import Path
-from inkscape_layer_utils.image import Image
+from inkscape_layer_utils.image import Image, LayerUnknownError
+
 
 #
 # General naming convention for unit tests:
@@ -52,6 +53,26 @@ class ImageTestCase(unittest.TestCase):
             ],
             self.test_image.get_all_layer_paths(),
         )
+
+    def test_ImageWithMultipleLayers_FindExistingLayerByName_LayerReturned(self):
+        self.assertEqual("right", self.test_image.find_layers_by_name("right")[0].layer_name)
+
+    def test_ImageWithMultipleLayers_FindNonExistingLayerByName_EmptyLayerListReturned(self):
+        self.assertEqual(0, len(self.test_image.find_layers_by_name("not_existing")))
+
+    def test_ImageWithMultipleLayers_GetExistingLayerByPath_LayerReturned(self):
+        self.assertEqual("left", self.test_image.get_layer_by_path("/face/eyes/left").layer_name)
+
+    def test_ImageWithMultipleLayers_GetRootLayerByPath_RootLayerReturned(self):
+        self.assertEqual("/", self.test_image.get_layer_by_path("/").layer_name)
+
+    def test_ImageWithMultipleLayers_GetNonExistingLayerByPath_LayerUnknownErrorRaised(self):
+        with self.assertRaises(LayerUnknownError):
+            self.test_image.get_layer_by_path("/not/existing")
+
+    def test_ImageWithMultipleLayers_GetLayerByInvalidPath_LayerUnknownErrorRaised(self):
+        with self.assertRaises(LayerUnknownError):
+            self.test_image.get_layer_by_path("invalid_path")
 
     def test_RequestedLayerAvailable_ExtractSingleLayerByPath_SingleLayerExtracted(
         self,

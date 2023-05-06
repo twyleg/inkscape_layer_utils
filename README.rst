@@ -1,27 +1,7 @@
-# Inkscape svg layer extractor
+Inkscape Layer Utils
+====================
 
-Small script to extract layers from inscape svg
+Simple utils to interact with Inkscape SVG images and their layers.
+Typical use case is extracting layers from an input SVG or manipulating attributes of elements in an image
+(e.g. coloring certain elements).
 
-## Setup environment
-
-To setup a development environment and install all requirements run the following commands (example for windows):
-
-    python -m venv venv
-    venv/Scripts/activate
-    python -m pip install -r requirements.txt
-
-## Build and deploy
-
-### Build
-
-    python setup.py sdist bdist_wheel
-
-### Deploy
-
-TestPyPI:
-
-    python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-    
-PyPi:
-
-    python -m twine upload dist/*

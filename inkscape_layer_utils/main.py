@@ -1,4 +1,4 @@
-# Copyright (C) 2022 twyleg
+# Copyright (C) 2023 twyleg
 import json
 import os
 import sys

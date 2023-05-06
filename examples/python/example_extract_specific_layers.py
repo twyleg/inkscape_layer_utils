@@ -12,11 +12,7 @@ if __name__ == "__main__":
 
     image = Image.load_from_file(INPUT_DIR / "test_image_0.svg")
 
-    layers_to_extract_by_path = [
-        "/background",
-        "/face/mouth",
-        "/face/nose"
-    ]
+    layers_to_extract_by_path = ["/background", "/face/mouth", "/face/nose"]
 
     print("Extracting the following layers to a single file:")
     for layer_path in layers_to_extract_by_path:
