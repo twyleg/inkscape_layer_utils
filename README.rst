@@ -22,4 +22,4 @@ The utilities can be used as a library or command line tool. Take a look at the 
 Examples
 --------
 
-All examples can be found in the `examples/ <https://github.com/twyleg/inkscape_layer_utils/examples>`_ directory.
+All examples can be found in the `examples/ <https://github.com/twyleg/inkscape_layer_utils/tree/master/examples>`_ directory.
