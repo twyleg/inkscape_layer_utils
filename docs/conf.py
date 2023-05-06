@@ -9,7 +9,7 @@ extensions = [
 html_theme = "sphinx_rtd_theme"
 
 master_doc = "index"
-project = "Inkscape SVG Utils"
+project = "Inkscape Layer Utils"
 copyright = "2023, twyleg"
 author = "Torsten Wylegala"
 version = release = __version__

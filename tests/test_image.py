@@ -74,21 +74,21 @@ class ImageTestCase(unittest.TestCase):
         with self.assertRaises(LayerUnknownError):
             self.test_image.get_layer_by_path("invalid_path")
 
-    def test_RequestedLayerAvailable_ExtractSingleLayerByPath_SingleLayerExtracted(
+    def test_RequestedLayerAvailable_ExtractSingleLayerByPathWithPathPreservation_SingleLayerExtractedWithPathPreservation(
         self,
     ):
         extracted_layer_image = self.test_image.extract_layer("/face/eyes/right")
         self.assert_images_equal(
-            "resources/expected_images/extracted_single_layer_by_path.svg",
+            "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
             extracted_layer_image,
         )
 
-    def test_RequestedLayerAvailable_ExtractSingleLayerByPathAndPreserveLayerPath_SingleLayerExtractedAndLayerPathPreserved(
+    def test_RequestedLayerAvailable_ExtractSingleLayerByPathWithoutPathPreservation_SingleLayerExtractedWithoutLayerPathPreservation(
         self,
     ):
-        extracted_layer_image = self.test_image.extract_layer("/face/eyes/right", preserve_layer_paths=True)
+        extracted_layer_image = self.test_image.extract_layer("/face/eyes/right", preserve_layer_paths=False)
         self.assert_images_equal(
-            "resources/expected_images/extracted_single_layer_by_path_and_preserve_layer_path.svg",
+            "resources/expected_images/extracted_single_layer_by_path_without_layer_path_preservation.svg",
             extracted_layer_image,
         )
 
