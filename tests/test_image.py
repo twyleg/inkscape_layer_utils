@@ -1,10 +1,8 @@
 # Copyright (C) 2023 twyleg
-import os
 import unittest
 import tempfile
 import xml.etree.ElementTree as ET
 
-from os import PathLike
 from pathlib import Path
 from inkscape_layer_utils.image import Image, LayerUnknownError
 
