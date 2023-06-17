@@ -1,11 +1,17 @@
-# Copyright (C) 2023 twyleg
+__# Copyright (C) 2023 twyleg
 import os
 import versioneer
+from pathlib import Path
 from setuptools import find_packages, setup
 
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+def read(relative_filepath):
+    return open(Path(__file__).parent / relative_filepath).read()
+
+
+def read_long_description() -> str:
+    return read("README.rst").replace("docs/_static/", "https://raw.githubusercontent.com/twyleg/inkscape_layer_utils"
+                                                       "/master/docs/_static/")
 
 
 setup(
@@ -19,7 +25,7 @@ setup(
     keywords="inkscape svg layer utilities",
     url="https://github.com/twyleg/inkscape_layer_utils",
     packages=find_packages(),
-    long_description=read("README.rst"),
+    long_description=read_long_description(),
     install_requires=[],
     entry_points={
         "console_scripts": [
