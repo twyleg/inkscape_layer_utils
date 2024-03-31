@@ -42,9 +42,20 @@ class Object:
         self.object_element = object_element
         self.tag: str = object_element.tag
         self.id: str = object_element.attrib["id"]
+        self.objects: OrderedDict[str, Object] = self.__parse_objects()
 
     def __str__(self) -> str:
         return f"Object: tag={self.tag}, id={self.id}"
+
+    def __parse_objects(self) -> OrderedDict[str, "Object"]:
+        object_dict: OrderedDict[str, Object] = OrderedDict()
+
+        for element in self.object_element:
+            if "id" in element.attrib:
+                object = Object(element)
+                object_dict[object.id] = object
+
+        return object_dict
 
     def set_fill_color(self, color: str, force=False) -> None:
         """
@@ -57,6 +68,9 @@ class Object:
         force: bool
             Force to colorize even if not colorized at the moment
         """
+        for object in self.objects.values():
+            object.set_fill_color(color, force)
+
         style = self.object_element.attrib["style"]
         style_dict = OrderedDict(item.split(":") for item in style.split(";"))
         if force:
@@ -77,6 +91,9 @@ class Object:
         force: bool
             Force to colorize even if not colorized at the moment
         """
+        for object in self.objects.values():
+            object.set_stroke_paint_color(color, force)
+
         style = self.object_element.attrib["style"]
         style_dict = OrderedDict(item.split(":") for item in style.split(";"))
         if force:
@@ -170,21 +187,6 @@ class Group:
 
         for object in self.objects.values():
             object.set_stroke_paint_color(color, force)
-
-    # def colorize_all_objects_if_already_colored(self, color: str, recursive=False) -> None:
-    #     """
-    #     Set the stroke paint and fill color of all objects within the group to the given value, if they are already colorized.
-    #
-    #     Parameters
-    #     ----------
-    #     color: str
-    #         The color string in Hex RGB format. E.g. '#FF0000' for red.
-    #     """
-    #     for group in self.groups.values():
-    #         group.colorize_all_objects_if_already_colored(color, recursive=recursive)
-    #
-    #     for object in self.objects.values():
-    #         object.set_color_if_already_colored(color)
 
 
 class Layer(Group):
