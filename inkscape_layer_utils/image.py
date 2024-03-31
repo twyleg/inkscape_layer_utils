@@ -62,7 +62,7 @@ class Object:
         if force:
             style_dict["fill"] = color
         else:
-            if style_dict["fill"] != "none":
+            if "fill" in style_dict and style_dict["fill"] != "none":
                 style_dict["fill"] = color
         self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
@@ -82,7 +82,7 @@ class Object:
         if force:
             style_dict["stroke"] = color
         else:
-            if style_dict["stroke"] != "none":
+            if "stroke" in style_dict and style_dict["stroke"] != "none":
                 style_dict["stroke"] = color
         self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
