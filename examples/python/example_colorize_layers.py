@@ -13,6 +13,10 @@ if __name__ == "__main__":
     image = Image.load_from_file(INPUT_DIR / "test_image_0.svg")
 
     eyes_layer = image.get_layer_by_path("/face/eyes")
-    eyes_layer.fill_all_objects("#FF0000", recursive=True)
+    eyes_layer.fill_all_objects("#FF0000", force=True, recursive=True)
+
+    mouth_layer = image.get_layer_by_path("/face/mouth")
+    # mouth_layer.stroke_paint_all_objects("#FF0000", recursive=True)
+    mouth_layer.stroke_paint_all_objects("#FF0000", recursive=True)
 
     image.save(OUTPUT_DIR / "colorized_eyes_layer.svg")

@@ -12,6 +12,8 @@ from inkscape_layer_utils.image import Image, LayerUnknownError
 #               test_INITIALSTATE_ACTION_EXPECTATION
 #
 
+FILE_PATH = Path(__file__).parent
+
 
 class ImageTestCase(unittest.TestCase):
     @classmethod
@@ -21,13 +23,25 @@ class ImageTestCase(unittest.TestCase):
 
     @classmethod
     def prepare_test_image(cls) -> Image:
-        element_tree = ET.parse(Path(__file__).parent / "resources/test_images/test_image_0.svg")
+        element_tree = ET.parse(FILE_PATH / "resources/test_images/test_image_0.svg")
         return Image(element_tree)
 
+    def assert_image_element_trees_equal(
+        self, expected_image_element_tree: ET.Element, actual_image_element_tree: ET.Element
+    ):
+        self.assertEqual(ET.tostring(expected_image_element_tree), ET.tostring(actual_image_element_tree))
+
     def assert_images_equal(self, expected_image_filepath: str, actual_image: Image):
-        expected_element_tree = ET.parse(Path(__file__).parent / expected_image_filepath)
+        expected_element_tree = ET.parse(FILE_PATH / expected_image_filepath)
         root_node = expected_element_tree.getroot()
-        self.assertEqual(ET.tostring(root_node), ET.tostring(actual_image.layer_element))
+        self.assert_image_element_trees_equal(root_node, actual_image.layer_element)
+
+    def assert_images_from_file_equal(self, expected_image_filepath: Path, actual_image_filepath: Path):
+        expected_element_tree = ET.parse(expected_image_filepath)
+        actual_element_tree = ET.parse(actual_image_filepath)
+        expected_root_node = expected_element_tree.getroot()
+        actual_root_node = actual_element_tree.getroot()
+        self.assert_image_element_trees_equal(expected_root_node, actual_root_node)
 
     def save_image_to_tmp_directory(self, image: Image) -> None:
         image.save(self.output_dir_path / f"{self.shortDescription()}.svg")
@@ -100,6 +114,49 @@ class ImageTestCase(unittest.TestCase):
         self.assert_images_equal(
             "resources/expected_images/extracted_multiple_layers_by_path_and_preserve_layer_paths.svg",
             extracted_layer_image,
+        )
+
+    def test_RequestedLayersAvailable_ExtractAllLayersToFile_AllLayersExtractedAndWrittenToFile(
+        self,
+    ):
+        layer_output_dir_path = self.output_dir_path / "layers"
+
+        extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file(
+            layer_output_dir_path,
+            "base_name",
+        )
+
+        self.assertEqual(extracted_image_file_paths_by_layer_paths["/"], layer_output_dir_path / "base_name.svg")
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/background"], layer_output_dir_path / "base_name_background.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/outline"], layer_output_dir_path / "base_name_outline.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face"], layer_output_dir_path / "base_name_face.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/mouth"], layer_output_dir_path / "base_name_face_mouth.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes"], layer_output_dir_path / "base_name_face_eyes.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/left"],
+            layer_output_dir_path / "base_name_face_eyes_left.svg",
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
+            layer_output_dir_path / "base_name_face_eyes_right.svg",
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/nose"], layer_output_dir_path / "base_name_face_nose.svg"
+        )
+
+        self.assert_images_from_file_equal(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
+            FILE_PATH / "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
         )
 
 

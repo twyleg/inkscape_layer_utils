@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from os import PathLike
 from collections import OrderedDict
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 from xml.etree.ElementTree import Element, ElementTree
 
 
@@ -46,7 +46,7 @@ class Object:
     def __str__(self) -> str:
         return f"Object: tag={self.tag}, id={self.id}"
 
-    def set_fill_color(self, color: str) -> None:
+    def set_fill_color(self, color: str, force=False) -> None:
         """
         Set the fill color of an object to the given value.
 
@@ -54,10 +54,36 @@ class Object:
         ----------
         color: str
             The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
         """
         style = self.object_element.attrib["style"]
         style_dict = OrderedDict(item.split(":") for item in style.split(";"))
-        style_dict["fill"] = color
+        if force:
+            style_dict["fill"] = color
+        else:
+            if style_dict["fill"] != "none":
+                style_dict["fill"] = color
+        self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+
+    def set_stroke_paint_color(self, color: str, force=False) -> None:
+        """
+        Set the stroke paint color of an object to the given value.
+
+        Parameters
+        ----------
+        color: str
+            The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
+        """
+        style = self.object_element.attrib["style"]
+        style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+        if force:
+            style_dict["stroke"] = color
+        else:
+            if style_dict["stroke"] != "none":
+                style_dict["stroke"] = color
         self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
 
@@ -111,7 +137,7 @@ class Group:
 
         return group_dict
 
-    def fill_all_objects(self, color: str) -> None:
+    def fill_all_objects(self, color: str, force=False) -> None:
         """
         Set the fill color of all objects within the group to the given value.
 
@@ -119,9 +145,46 @@ class Group:
         ----------
         color: str
             The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
         """
+        for group in self.groups.values():
+            group.fill_all_objects(color, force)
+
         for object in self.objects.values():
-            object.set_fill_color(color)
+            object.set_fill_color(color, force)
+
+    def stroke_paint_all_objects(self, color: str, force=False) -> None:
+        """
+        Set the stroke paint color of all objects within the group to the given value.
+
+        Parameters
+        ----------
+        color: str
+            The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
+        """
+        for group in self.groups.values():
+            group.stroke_paint_all_objects(color, force)
+
+        for object in self.objects.values():
+            object.set_stroke_paint_color(color, force)
+
+    # def colorize_all_objects_if_already_colored(self, color: str, recursive=False) -> None:
+    #     """
+    #     Set the stroke paint and fill color of all objects within the group to the given value, if they are already colorized.
+    #
+    #     Parameters
+    #     ----------
+    #     color: str
+    #         The color string in Hex RGB format. E.g. '#FF0000' for red.
+    #     """
+    #     for group in self.groups.values():
+    #         group.colorize_all_objects_if_already_colored(color, recursive=recursive)
+    #
+    #     for object in self.objects.values():
+    #         object.set_color_if_already_colored(color)
 
 
 class Layer(Group):
@@ -294,7 +357,7 @@ class Layer(Group):
         if self.layer_path != "/" and self.layer_path not in paths:
             self.remove_all_objects_and_groups()
 
-    def fill_all_objects(self, color: str, recursive=False) -> None:
+    def fill_all_objects(self, color: str, force=False, recursive=False) -> None:
         """
         Set the fill color of all objects and groups within the group to the given value.
         If recursive is activated, all objects on sublayers will be filled as well.
@@ -303,15 +366,38 @@ class Layer(Group):
         ----------
         color: str
             The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
         recursive: bool
             Flag to enable recursive coloring.
 
         """
-        super().fill_all_objects(color)
+        super().fill_all_objects(color, force)
 
         if recursive:
             for layer in self.layers.values():
-                layer.fill_all_objects(color, recursive=recursive)
+                layer.fill_all_objects(color, force=force, recursive=recursive)
+
+    def stroke_paint_all_objects(self, color: str, force=False, recursive=False) -> None:
+        """
+        Set the stroke paint color of all objects and groups within the group to the given value.
+        If recursive is activated, all objects on sublayers will be stroke painted as well.
+
+        Parameters
+        ----------
+        color: str
+            The color string in Hex RGB format. E.g. '#FF0000' for red.
+        force: bool
+            Force to colorize even if not colorized at the moment
+        recursive: bool
+            Flag to enable recursive coloring.
+
+        """
+        super().stroke_paint_all_objects(color, force=force)
+
+        if recursive:
+            for layer in self.layers.values():
+                layer.stroke_paint_all_objects(color, force=force, recursive=recursive)
 
 
 class Image(Layer):
@@ -440,7 +526,7 @@ class Image(Layer):
         layer_path_list = self.get_all_layer_paths()
         return dict((layer_path, self.extract_layer(layer_path)) for layer_path in layer_path_list)
 
-    def extract_all_layers_to_file(self, output_dir: PathLike, base_name: str) -> None:
+    def extract_all_layers_to_file(self, output_dir: PathLike, base_name: str) -> Dict[str, Path]:
         """
         Extract all layers to file by providing an output directory and a base name for
         the extracted layers output file names.
@@ -451,13 +537,21 @@ class Image(Layer):
             Output directory to write files to.
         base_name: str
             Base name of the files that will be saved.
+        Returns
+        -------
+        dict[str, Path]
+            Dictionary with file paths by layer paths.
         """
+        extracted_layer_file_paths_by_layer_path: Dict[str, Path] = {}
         extracted_images = self.extract_all_layers()
         for layer_path, extracted_image in extracted_images.items():
             if layer_path == "/":
-                extracted_image.save(Path(output_dir) / f"{base_name}.svg")
+                output_file_path = Path(output_dir) / f"{base_name}.svg"
             else:
-                extracted_image.save(Path(output_dir) / f'{base_name}{layer_path.replace("/", "_")}.svg')
+                output_file_path = Path(output_dir) / f'{base_name}{layer_path.replace("/", "_")}.svg'
+            extracted_image.save(output_file_path)
+            extracted_layer_file_paths_by_layer_path[layer_path] = output_file_path
+        return extracted_layer_file_paths_by_layer_path
 
     def save(self, path: PathLike) -> None:
         """
