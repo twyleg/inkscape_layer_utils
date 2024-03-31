@@ -71,14 +71,15 @@ class Object:
         for object in self.objects.values():
             object.set_fill_color(color, force)
 
-        style = self.object_element.attrib["style"]
-        style_dict = OrderedDict(item.split(":") for item in style.split(";"))
-        if force:
-            style_dict["fill"] = color
-        else:
-            if "fill" in style_dict and style_dict["fill"] != "none":
+        if "style" in self.object_element.attrib:
+            style = self.object_element.attrib["style"]
+            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+            if force:
                 style_dict["fill"] = color
-        self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+            else:
+                if "fill" in style_dict and style_dict["fill"] != "none":
+                    style_dict["fill"] = color
+            self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
     def set_stroke_paint_color(self, color: str, force=False) -> None:
         """
@@ -94,14 +95,15 @@ class Object:
         for object in self.objects.values():
             object.set_stroke_paint_color(color, force)
 
-        style = self.object_element.attrib["style"]
-        style_dict = OrderedDict(item.split(":") for item in style.split(";"))
-        if force:
-            style_dict["stroke"] = color
-        else:
-            if "stroke" in style_dict and style_dict["stroke"] != "none":
+        if "style" in self.object_element.attrib:
+            style = self.object_element.attrib["style"]
+            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+            if force:
                 style_dict["stroke"] = color
-        self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+            else:
+                if "stroke" in style_dict and style_dict["stroke"] != "none":
+                    style_dict["stroke"] = color
+            self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
 
 class Group:
