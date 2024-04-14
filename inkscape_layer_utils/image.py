@@ -1,8 +1,7 @@
-# Copyright (C) 2023 twyleg
+# Copyright (C) 2024 twyleg
 import copy
 import os
 import xml.etree.ElementTree as ET
-from os import PathLike
 from collections import OrderedDict
 from pathlib import Path
 from typing import List, Optional, Dict
@@ -416,13 +415,13 @@ class Image(Layer):
     """
 
     @classmethod
-    def load_from_file(cls, file_path: PathLike) -> "Image":
+    def load_from_file(cls, file_path: Path) -> "Image":
         """
         Load a SVG image from file.
 
         Parameters
         ----------
-        file_path: PathLike
+        file_path: Path
             Path of file to load.
 
         Returns
@@ -530,14 +529,14 @@ class Image(Layer):
         layer_path_list = self.get_all_layer_paths()
         return dict((layer_path, self.extract_layer(layer_path)) for layer_path in layer_path_list)
 
-    def extract_all_layers_to_file(self, output_dir: PathLike, base_name: str) -> Dict[str, Path]:
+    def extract_all_layers_to_file(self, output_dir: Path, base_name: str) -> Dict[str, Path]:
         """
         Extract all layers to file by providing an output directory and a base name for
         the extracted layers output file names.
 
         Parameters
         ----------
-        output_dir: PathLike
+        output_dir: Path
             Output directory to write files to.
         base_name: str
             Base name of the files that will be saved.
@@ -557,14 +556,50 @@ class Image(Layer):
             extracted_layer_file_paths_by_layer_path[layer_path] = output_file_path
         return extracted_layer_file_paths_by_layer_path
 
-    def save(self, path: PathLike) -> None:
+    def extract_all_layers_to_file_lazy(
+        self, output_dir: Path, base_name: str, input_file_path: Path
+    ) -> Dict[str, Path]:
+        """
+        Extract all layers to file by providing an output directory and a base name for
+        the extracted layers output file names.
+        Only write output to file when either the output file is not yet existing or the input files modification
+        timestamp is more recent than the output file timestamp (comparable with GNU makes timestamp check).
+
+        Parameters
+        ----------
+        output_dir: Path
+            Output directory to write files to.
+        base_name: str
+            Base name of the files that will be saved.
+        input_file_path: Path
+            The input file path to determine the change timestamp.
+        Returns
+        -------
+        dict[str, Path]
+            Dictionary with file paths by layer paths.
+        """
+        extracted_layer_file_paths_by_layer_path: Dict[str, Path] = {}
+        extracted_images = self.extract_all_layers()
+        for layer_path, extracted_image in extracted_images.items():
+            if layer_path == "/":
+                output_file_path = Path(output_dir) / f"{base_name}.svg"
+            else:
+                output_file_path = Path(output_dir) / f'{base_name}{layer_path.replace("/", "_")}.svg'
+            if output_file_path.exists() is False or os.path.getmtime(input_file_path) > os.path.getmtime(
+                output_file_path
+            ):
+                extracted_image.save(output_file_path)
+            extracted_layer_file_paths_by_layer_path[layer_path] = output_file_path
+        return extracted_layer_file_paths_by_layer_path
+
+    def save(self, path: Path) -> None:
         """
         Save image to file.
 
         Parameters
         ----------
-        path: PathLike
+        path: Path
             File location to write image to.
         """
-        os.makedirs(Path(path).parent, exist_ok=True)
+        path.parent.mkdir(exist_ok=True)
         self.element_tree.write(path)

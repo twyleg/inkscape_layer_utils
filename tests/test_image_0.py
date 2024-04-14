@@ -1,4 +1,7 @@
 # Copyright (C) 2023 twyleg
+import os.path
+import shutil
+import time
 import unittest
 
 from pathlib import Path
@@ -126,6 +129,70 @@ class Image0TestCase(ImageTestCase):
             extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
             FILE_PATH / "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
         )
+
+    def test_OutputFilesNotYetExisting_ExtractAllLayersToFileLazy_AllLayersExtractedAndWrittenToFile(
+        self,
+    ):
+        layer_output_dir_path = self.output_dir_path / "layers"
+
+        extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file_lazy(
+            layer_output_dir_path, "base_name", self.test_image_path
+        )
+
+        self.assertEqual(extracted_image_file_paths_by_layer_paths["/"], layer_output_dir_path / "base_name.svg")
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/background"], layer_output_dir_path / "base_name_background.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/outline"], layer_output_dir_path / "base_name_outline.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face"], layer_output_dir_path / "base_name_face.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/mouth"], layer_output_dir_path / "base_name_face_mouth.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes"], layer_output_dir_path / "base_name_face_eyes.svg"
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/left"],
+            layer_output_dir_path / "base_name_face_eyes_left.svg",
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
+            layer_output_dir_path / "base_name_face_eyes_right.svg",
+        )
+        self.assertEqual(
+            extracted_image_file_paths_by_layer_paths["/face/nose"], layer_output_dir_path / "base_name_face_nose.svg"
+        )
+
+        self.assert_images_from_file_equal(
+            extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
+            FILE_PATH / "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
+        )
+
+    def test_OutputFilesOlderThanInputFile_ExtractAllLayersToFileLazy_AllLayersExtractedAgainAndWrittenToFile(
+        self,
+    ):
+        layer_output_dir_path = self.output_dir_path / "layers"
+
+        extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file_lazy(
+            layer_output_dir_path, "base_name", self.test_image_path
+        )
+
+        self.assert_mtime_newer(extracted_image_file_paths_by_layer_paths["/"], self.test_image_path)
+
+        time.sleep(0.1)
+        self.test_image_path.touch()
+
+        self.assert_mtime_newer(self.test_image_path, extracted_image_file_paths_by_layer_paths["/"])
+
+        extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file_lazy(
+            layer_output_dir_path, "base_name", self.test_image_path
+        )
+
+        self.assert_mtime_newer(extracted_image_file_paths_by_layer_paths["/"], self.test_image_path)
 
 
 if __name__ == "__main__":

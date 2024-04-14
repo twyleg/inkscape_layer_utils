@@ -1,4 +1,5 @@
 # Copyright (C) 2024 twyleg
+import os
 import unittest
 import tempfile
 import xml.etree.ElementTree as ET
@@ -40,6 +41,9 @@ class ImageTestCase(unittest.TestCase):
         expected_root_node = expected_element_tree.getroot()
         actual_root_node = actual_element_tree.getroot()
         self.assert_image_element_trees_equal(expected_root_node, actual_root_node)
+
+    def assert_mtime_newer(self, newer_file_path: Path, older_file_path: Path):
+        self.assertGreater(os.path.getmtime(newer_file_path), os.path.getmtime(older_file_path))
 
     def save_image_to_tmp_directory(self, image: Image) -> None:
         image.save(self.output_dir_path / f"{self.shortDescription()}.svg")
