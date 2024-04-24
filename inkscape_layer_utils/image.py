@@ -402,6 +402,29 @@ class Layer(Group):
             for layer in self.layers.values():
                 layer.stroke_paint_all_objects(color, force=force, recursive=recursive)
 
+    def set_visibility(self, visibility: bool, recursive=False) -> None:
+        """
+        Set the visibility of a specific layer and its children (when recursive flag is set)
+
+        Parameters
+        ----------
+        visibility: bool
+            Visibility to set for layer.
+        recursive: bool
+            Flag to enable recursive modification of visibility.
+
+        """
+        if recursive:
+            for layer in self.layers.values():
+                layer.set_visibility(visibility, recursive)
+
+        if "style" in self.layer_element.attrib:
+            style = self.layer_element.attrib["style"]
+            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+
+            style_dict["display"] = "inline" if visibility else "none"
+            self.layer_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+
 
 class Image(Layer):
     """
