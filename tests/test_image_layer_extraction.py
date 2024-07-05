@@ -19,7 +19,7 @@ FILE_PATH = Path(__file__).parent
 
 class Image0TestCase(ImageTestCase):
     def __init__(self, *args, **kwargs):
-        super().__init__(FILE_PATH / "resources/test_images/test_image_0.svg", *args, **kwargs)
+        super().__init__(FILE_PATH / "resources/test_images/test_image_layer_extraction_0.svg", *args, **kwargs)
 
     def test_ImageWithMultipleLayers_GetListOfLayers_CorrectListOfLayersReturned(self):
         self.assertEqual(
@@ -62,7 +62,7 @@ class Image0TestCase(ImageTestCase):
     ):
         extracted_layer_image = self.test_image.extract_layer("/face/eyes/right")
         self.assert_images_equal(
-            "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
+            "resources/expected_images/test_image_layer_extraction_extracted_single_layer_by_path_with_layer_path_preservation.svg",
             extracted_layer_image,
         )
 
@@ -71,7 +71,7 @@ class Image0TestCase(ImageTestCase):
     ):
         extracted_layer_image = self.test_image.extract_layer("/face/eyes/right", preserve_layer_paths=False)
         self.assert_images_equal(
-            "resources/expected_images/extracted_single_layer_by_path_without_layer_path_preservation.svg",
+            "resources/expected_images/test_image_layer_extraction_extracted_single_layer_by_path_without_layer_path_preservation.svg",
             extracted_layer_image,
         )
 
@@ -83,7 +83,7 @@ class Image0TestCase(ImageTestCase):
             preserve_layer_paths=True,
         )
         self.assert_images_equal(
-            "resources/expected_images/extracted_multiple_layers_by_path_and_preserve_layer_paths.svg",
+            "resources/expected_images/test_image_layer_extraction_extracted_multiple_layers_by_path_and_preserve_layer_paths.svg",
             extracted_layer_image,
         )
 
@@ -127,7 +127,7 @@ class Image0TestCase(ImageTestCase):
 
         self.assert_images_from_file_equal(
             extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
-            FILE_PATH / "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
+            FILE_PATH / "resources/expected_images/test_image_layer_extraction_extracted_single_layer_by_path_with_layer_path_preservation.svg",
         )
 
     def test_OutputFilesNotYetExisting_ExtractAllLayersToFileLazy_AllLayersExtractedAndWrittenToFile(
@@ -169,7 +169,7 @@ class Image0TestCase(ImageTestCase):
 
         self.assert_images_from_file_equal(
             extracted_image_file_paths_by_layer_paths["/face/eyes/right"],
-            FILE_PATH / "resources/expected_images/extracted_single_layer_by_path_with_layer_path_preservation.svg",
+            FILE_PATH / "resources/expected_images/test_image_layer_extraction_extracted_single_layer_by_path_with_layer_path_preservation.svg",
         )
 
     def test_OutputFilesOlderThanInputFile_ExtractAllLayersToFileLazy_AllLayersExtractedAgainAndWrittenToFile(
