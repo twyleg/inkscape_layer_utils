@@ -56,6 +56,17 @@ class Object:
 
         return object_dict
 
+    def _set_style_attribute(self, key: str, value: str | float | int, force=False):
+        if "style" in self.object_element.attrib:
+            style = self.object_element.attrib["style"]
+            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
+            if force:
+                style_dict[key] = str(value)
+            else:
+                if key in style_dict and style_dict[key] != "none":
+                    style_dict[key] = str(value)
+            self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+
     def set_fill_color(self, color: str, force=False) -> None:
         """
         Set the fill color of an object to the given value.
@@ -65,20 +76,12 @@ class Object:
         color: str
             The color string in Hex RGB format. E.g. '#FF0000' for red.
         force: bool
-            Force to colorize even if not colorized at the moment
+            Force to colorize even if not colorized at the moment.
         """
         for object in self.objects.values():
             object.set_fill_color(color, force)
 
-        if "style" in self.object_element.attrib:
-            style = self.object_element.attrib["style"]
-            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
-            if force:
-                style_dict["fill"] = color
-            else:
-                if "fill" in style_dict and style_dict["fill"] != "none":
-                    style_dict["fill"] = color
-            self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+        self._set_style_attribute("fill", color, force)
 
     def set_stroke_paint_color(self, color: str, force=False) -> None:
         """
@@ -89,20 +92,44 @@ class Object:
         color: str
             The color string in Hex RGB format. E.g. '#FF0000' for red.
         force: bool
-            Force to colorize even if not colorized at the moment
+            Force to colorize even if not colorized at the moment.
         """
         for object in self.objects.values():
             object.set_stroke_paint_color(color, force)
 
-        if "style" in self.object_element.attrib:
-            style = self.object_element.attrib["style"]
-            style_dict = OrderedDict(item.split(":") for item in style.split(";"))
-            if force:
-                style_dict["stroke"] = color
-            else:
-                if "stroke" in style_dict and style_dict["stroke"] != "none":
-                    style_dict["stroke"] = color
-            self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
+        self._set_style_attribute("stroke", color, force)
+
+    def set_fill_opacity(self, opacity: float, force=False) -> None:
+        """
+        Set the fill opacity of an object to the given value.
+
+        Parameters
+        ----------
+        opacity: float
+            The the objects opacity from 0.0 - 1.0 (0% - 100%).
+        force: bool
+            Force to set the opacity attribute even if it is not present at the moment.
+        """
+        for object in self.objects.values():
+            object.set_fill_opacity(opacity)
+
+        self._set_style_attribute("fill-opacity", opacity, force)
+
+    def set_stroke_opacity(self, opacity: float, force=False) -> None:
+        """
+        Set the stroke opacity of an object to the given value.
+
+        Parameters
+        ----------
+        opacity: float
+            The the objects opacity from 0.0 - 1.0 (0% - 100%).
+        force: bool
+            Force to set the opacity attribute even if it is not present at the moment.
+        """
+        for object in self.objects.values():
+            object.set_fill_opacity(opacity)
+
+        self._set_style_attribute("stroke-opacity", opacity, force)
 
 
 class Group:
@@ -188,6 +215,40 @@ class Group:
 
         for object in self.objects.values():
             object.set_stroke_paint_color(color, force)
+
+    def set_fill_opacity_of_all_objects(self, opacity: float, force=False) -> None:
+        """
+        Set the fill opacity of all objects within the group to the given value.
+
+        Parameters
+        ----------
+        opacity: float
+            The the objects opacity from 0.0 - 1.0 (0% - 100%).
+        force: bool
+            Force to set the opacity attribute even if it is not present at the moment.
+        """
+        for group in self.groups.values():
+            group.set_fill_opacity_of_all_objects(opacity, force)
+
+        for object in self.objects.values():
+            object.set_fill_opacity(opacity, force)
+
+    def set_stroke_opacity_of_all_objects(self, opacity: float, force=False) -> None:
+        """
+        Set the stroke opacity of all objects within the group to the given value.
+
+        Parameters
+        ----------
+        opacity: float
+            The the objects opacity from 0.0 - 1.0 (0% - 100%).
+        force: bool
+            Force to set the opacity attribute even if it is not present at the moment.
+        """
+        for group in self.groups.values():
+            group.set_stroke_opacity_of_all_objects(opacity, force)
+
+        for object in self.objects.values():
+            object.set_stroke_opacity(opacity, force)
 
 
 class Layer(Group):
