@@ -64,7 +64,7 @@ class Object:
                 style_dict[key] = str(value)
             else:
                 if key in style_dict and style_dict[key] != "none":
-                    style_dict[key] = value
+                    style_dict[key] = str(value)
             self.object_element.attrib["style"] = ";".join([f"{key}:{value}" for key, value in style_dict.items()])
 
     def set_fill_color(self, color: str, force=False) -> None:
