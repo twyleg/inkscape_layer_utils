@@ -26,6 +26,7 @@ setup(
     url="https://github.com/twyleg/inkscape_layer_utils",
     packages=find_packages(),
     long_description=read_long_description(),
+    include_package_data=True,
     install_requires=[],
     entry_points={
         "console_scripts": [
