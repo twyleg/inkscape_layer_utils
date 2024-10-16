@@ -1,11 +1,15 @@
 # Copyright (C) 2024 twyleg
 import copy
 import os
+import logging
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from pathlib import Path
 from typing import List, Optional, Dict
 from xml.etree.ElementTree import Element, ElementTree
+
+
+logm = logging.getLogger(__name__)
 
 
 class LayerUnknownError(Exception):
@@ -514,6 +518,7 @@ class Image(Layer):
             Loaded image.
 
         """
+        logm.debug("Loading image from file: %s", file_path)
         return Image(ET.parse(file_path))
 
     @classmethod
@@ -532,6 +537,7 @@ class Image(Layer):
             Loaded image.
 
         """
+        logm.debug("Loading image from string")
         return Image(ElementTree(ET.fromstring(image_as_string)))
 
     def __init__(self, element_tree: ElementTree) -> None:
@@ -561,6 +567,7 @@ class Image(Layer):
             Output image that will contain only the requested layer.
 
         """
+        logm.debug("Extracting layer: path=\"%s\", preserve_layer_path=%b", path, preserve_layer_paths)
         if path == "/":
             return copy.deepcopy(self)
         else:
@@ -584,6 +591,8 @@ class Image(Layer):
             Output image that will contain only the requested layers.
 
         """
+        logm.debug("Extracting layers: paths=\"%s\", preserve_layer_path=%b", paths, preserve_layer_paths)
+
         new_image = copy.deepcopy(self)
 
         if preserve_layer_paths:
