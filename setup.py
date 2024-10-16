@@ -9,9 +9,8 @@ def read(relative_filepath):
 
 
 def read_long_description() -> str:
-    return read("README.rst").replace(
-        "docs/_static/", "https://raw.githubusercontent.com/twyleg/inkscape_layer_utils" "/master/docs/_static/"
-    )
+    return read("README.rst").replace("docs/_static/", "https://raw.githubusercontent.com/twyleg/inkscape_layer_utils" "/master/docs/_static/")
+
 
 # fmt: off
 setup(

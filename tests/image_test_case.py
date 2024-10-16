@@ -25,9 +25,7 @@ class ImageTestCase(unittest.TestCase):
         element_tree = ET.parse(self.test_image_path)
         return Image(element_tree)
 
-    def assert_image_element_trees_equal(
-        self, expected_image_element_tree: ET.Element, actual_image_element_tree: ET.Element
-    ):
+    def assert_image_element_trees_equal(self, expected_image_element_tree: ET.Element, actual_image_element_tree: ET.Element):
         self.assertEqual(ET.tostring(expected_image_element_tree), ET.tostring(actual_image_element_tree))
 
     def assert_images_equal(self, expected_image_filepath: str, actual_image: Image):

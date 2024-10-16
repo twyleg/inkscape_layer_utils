@@ -1,14 +1,13 @@
 # Copyright (C) 2024 twyleg
 import json
 import os
-import sys
 import argparse
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from pathlib import Path
 from typing import List
 
-from simple_python_app import SubcommandApplication
+from simple_python_app.subcommand_application import SubcommandApplication
 
 from inkscape_layer_utils import __version__
 from inkscape_layer_utils.image import Image
@@ -23,7 +22,7 @@ class InkscapeLayerUtils(SubcommandApplication):
             application_name="inkscape_layer_utils",
             version=__version__,
             application_config_init_enabled=False,
-            logging_config_init_enabled=False,
+            logging_init_custom_logging_enabled=False,
             logging_logfile_output_dir=FILE_DIR / "logs/",
         )
 
@@ -67,16 +66,16 @@ class InkscapeLayerUtils(SubcommandApplication):
                 help="SVG image file(s) to extract the layers from.",
             )
 
-
-    def _handle_extract_layers(self, args: argparse.Namespace) -> None:
+    def _handle_extract_layers(self, args: argparse.Namespace) -> int:
 
         for svg_file_path in args.svg_files:
             svg_file_element_tree = ET.parse(svg_file_path)
             svg_image = Image(svg_file_element_tree)
             svg_image.extract_all_layers_to_file(args.output, Path(svg_file_path).stem)
 
+        return 0
 
-    def _handle_list_layers(self, args: argparse.Namespace) -> None:
+    def _handle_list_layers(self, args: argparse.Namespace) -> int:
 
         layers_by_svg_file_path: OrderedDict[str, List[str]] = OrderedDict()
         for svg_file_path in args.svg_files:
@@ -91,6 +90,8 @@ class InkscapeLayerUtils(SubcommandApplication):
                 print(f"File: {svg_file_path}")
                 for layer_path in layer_paths:
                     print(f"  {layer_path}")
+
+        return 0
 
 
 def main() -> None:
