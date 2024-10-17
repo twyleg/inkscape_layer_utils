@@ -155,18 +155,15 @@ class Image0TestCase(ImageTestCase):
 
         self.assert_mtime_newer(extracted_image_file_paths_by_layer_paths["/"], self.test_image_path)
 
-        time.sleep(1.0)
+        time.sleep(0.1)
         self.test_image_path.touch()
-        time.sleep(1.0)
-
         self.assert_mtime_newer(self.test_image_path, extracted_image_file_paths_by_layer_paths["/"])
 
-        # self.test_image = self.prepare_test_image()
-
         extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file_lazy(layer_output_dir_path, "base_name", self.test_image_path)
-
+        # Closing of file is required to set the modification timestamp on some combinations of Windows and Python
+        # Since element tree does not provide a close function to close explicitly we need to enforce it by
+        # destroying the test_image explicitly that owns the element tree.
         del self.test_image
-
         self.assert_mtime_newer(extracted_image_file_paths_by_layer_paths["/"], self.test_image_path)
 
 
