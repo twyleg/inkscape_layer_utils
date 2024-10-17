@@ -9,28 +9,30 @@ def read(relative_filepath):
 
 
 def read_long_description() -> str:
-    return read("README.rst").replace(
-        "docs/_static/", "https://raw.githubusercontent.com/twyleg/inkscape_layer_utils" "/master/docs/_static/"
-    )
+    return read("README.rst").replace("docs/_static/", "https://raw.githubusercontent.com/twyleg/inkscape_layer_utils" "/master/docs/_static/")
 
 
+# fmt: off
 setup(
     name="inkscape_layer_utils",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     author="Torsten Wylegala",
     author_email="mail@twyleg.de",
-    description=("Simple library to extract and manipulate layers in inkscape SVGs"),
+    description="Simple library to extract and manipulate layers in inkscape SVGs",
     license="GPL 3.0",
     keywords="inkscape svg layer utilities",
     url="https://github.com/twyleg/inkscape_layer_utils",
     packages=find_packages(),
     long_description=read_long_description(),
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        "simple-python-app>=0.4.0",
+    ],
     entry_points={
         "console_scripts": [
             "inkscape_layer_utils = inkscape_layer_utils.main:main",
         ]
     },
 )
+# fmt: on

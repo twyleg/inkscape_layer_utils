@@ -15,9 +15,7 @@ extracted_single_layer_by_path_with_layer_path_preservation.save(
     SCRIPT_DIR / "expected_images/test_image_layer_extraction_extracted_single_layer_by_path_with_layer_path_preservation.svg"
 )
 
-extracted_single_layer_by_path_without_layer_path_preservation = test_image_layer_extraction_0.extract_layer(
-    "/face/eyes/right", preserve_layer_paths=False
-)
+extracted_single_layer_by_path_without_layer_path_preservation = test_image_layer_extraction_0.extract_layer("/face/eyes/right", preserve_layer_paths=False)
 extracted_single_layer_by_path_without_layer_path_preservation.save(
     SCRIPT_DIR / "expected_images/test_image_layer_extraction_extracted_single_layer_by_path_without_layer_path_preservation.svg"
 )
@@ -42,7 +40,4 @@ left_eye_layer.set_stroke_opacity_of_all_objects(0.0)
 left_eye_layer.fill_all_objects("#000000", True)
 right_eye_layer.set_fill_opacity_of_all_objects(1.0)
 right_eye_layer.set_stroke_opacity_of_all_objects(1.0)
-test_image_coloring_1.save(
-    SCRIPT_DIR / "expected_images/test_image_coloring_set_opacity.svg"
-)
-
+test_image_coloring_1.save(SCRIPT_DIR / "expected_images/test_image_coloring_set_opacity.svg")

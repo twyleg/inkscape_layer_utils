@@ -20,9 +20,7 @@ class Image1TestCase(ImageTestCase):
         self,
     ):
         self.test_image.find_layers_by_name("text")[0].fill_all_objects("#FF0000")
-        extracted_single_layer_by_path_with_colorized_text = self.test_image.extract_layer(
-            "/text", preserve_layer_paths=True
-        )
+        extracted_single_layer_by_path_with_colorized_text = self.test_image.extract_layer("/text", preserve_layer_paths=True)
 
         self.assert_images_equal(
             "resources/expected_images/test_image_coloring_extracted_single_layer_by_path_with_stroke_painted_text.svg",
