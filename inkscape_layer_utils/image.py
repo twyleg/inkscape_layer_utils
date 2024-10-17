@@ -755,6 +755,7 @@ class Image(Layer):
                 output_file_path = Path(output_dir) / f"{base_name}.svg"
             else:
                 output_file_path = Path(output_dir) / f'{base_name}{layer_path.replace("/", "_")}.svg'
+                
             if output_file_path.exists() is False:
                 self.logm.debug("Output file not yet existing. Save file!")
                 extracted_image.save(output_file_path)
