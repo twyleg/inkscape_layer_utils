@@ -27,7 +27,7 @@ setup(
     long_description=read_long_description(),
     include_package_data=True,
     install_requires=[
-        "simple-python-app>=0.3.0",
+        "simple-python-app>=0.4.0",
     ],
     entry_points={
         "console_scripts": [

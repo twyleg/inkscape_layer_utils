@@ -30,8 +30,8 @@ class InkscapeLayerUtils(SubcommandApplication):
         # fmt: off
         extract_layers_command = self.add_subcommand(
             command="extract_layers",
-            help="",
-            description="Counter going upwards with multiple parameters.",
+            help="Extract layers from SVG input file.",
+            description="Extract layers from SVG input file into multiple output files.",
             handler=self._handle_extract_layers
         )
 
@@ -45,14 +45,22 @@ class InkscapeLayerUtils(SubcommandApplication):
 
         list_layers_command = self.add_subcommand(
             command="list_layers",
-            help="Counter going downwards",
-            description="Counter going downwards with multiple parameters.",
+            help="List layers of SVG input file.",
+            description="List layers of SVG input file in plain text list or JSON format.",
             handler=self._handle_list_layers
         )
 
         list_layers_command.parser.add_argument(
             "-j",
             "--json",
+            help="Output results in JSON format instead of list.",
+            action="store_true"
+        )
+
+        list_layers_command.parser.add_argument(
+            "-p",
+            "--print",
+            help="Use print instead of log to return results.",
             action="store_true"
         )
         # fmt: on
@@ -67,7 +75,6 @@ class InkscapeLayerUtils(SubcommandApplication):
             )
 
     def _handle_extract_layers(self, args: argparse.Namespace) -> int:
-
         for svg_file_path in args.svg_files:
             svg_file_element_tree = ET.parse(svg_file_path)
             svg_image = Image(svg_file_element_tree)
@@ -77,6 +84,12 @@ class InkscapeLayerUtils(SubcommandApplication):
 
     def _handle_list_layers(self, args: argparse.Namespace) -> int:
 
+        def log_or_print_line(fmt: str, *vars) -> None:
+            if args.print:
+                print(fmt % vars)
+            else:
+                self.logm.info(fmt, *vars)
+
         layers_by_svg_file_path: OrderedDict[str, List[str]] = OrderedDict()
         for svg_file_path in args.svg_files:
             svg_file_element_tree = ET.parse(svg_file_path)
@@ -84,12 +97,14 @@ class InkscapeLayerUtils(SubcommandApplication):
             layers_by_svg_file_path[svg_file_path] = svg_image.get_all_layer_paths()
 
         if args.json:
-            print(json.dumps(layers_by_svg_file_path, indent=4))
+            json_str = json.dumps(layers_by_svg_file_path, indent=4)
+            for line in json_str.splitlines():
+                log_or_print_line(line)
         else:
             for svg_file_path, layer_paths in layers_by_svg_file_path.items():
-                print(f"File: {svg_file_path}")
+                log_or_print_line("File: %s", svg_file_path)
                 for layer_path in layer_paths:
-                    print(f"  {layer_path}")
+                    log_or_print_line("  %s", layer_path)
 
         return 0
 
