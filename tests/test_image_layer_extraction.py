@@ -160,6 +160,8 @@ class Image0TestCase(ImageTestCase):
 
         self.assert_mtime_newer(self.test_image_path, extracted_image_file_paths_by_layer_paths["/"])
 
+        self.test_image = self.prepare_test_image()
+
         extracted_image_file_paths_by_layer_paths = self.test_image.extract_all_layers_to_file_lazy(layer_output_dir_path, "base_name", self.test_image_path)
 
         self.assert_mtime_newer(extracted_image_file_paths_by_layer_paths["/"], self.test_image_path)
